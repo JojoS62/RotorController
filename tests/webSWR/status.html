@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html
+><head>
+<meta charset="UTF-8"/>
+<style>
+table {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+tbody tr:hover {background-color: #ddd;}
+
+thead {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #4CAF50;
+  color: white;
+}
+
+tbody {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #f2f2f2;
+  color: black;
+}
+</style>
+<title>Hello from Mbed</title>
+</head>
+<body>
+    <h1>Mbed Webserver Status</h1>
+    <table id="sysinfo" />
+    <table id="memtab" />
+    <table id="cpustats" />
+    <table id="threads" />
+    <script>
+    function createTable(id, jsonString, titles) {
+        var table1 = document.getElementById(id);
+
+        for(var k in jsonString)
+        {
+            var row = table1.insertRow(-1);
+            {
+                var cell = row.insertCell(0);
+                cell.innerHTML = k;
+                cell = row.insertCell(1);
+                cell.innerHTML = jsonString[k];
+            }
+        }
+
+        var header = table1.createTHead();
+        row = header.insertRow(0);    
+        cell = row.insertCell(0);
+        cell.innerHTML = titles[0];         
+        cell = row.insertCell(1);
+        cell.innerHTML = titles[1];    
+
+        document.body.appendChild(table1);  
+    };
+
+    function create2DTable(id, jsonString) {
+        var table1 = document.getElementById(id);
+
+        for(var k in jsonString)
+        {
+            if (k == 0) continue;
+
+            var row = table1.insertRow(-1);
+            for(var col in jsonString[k])
+            {
+                var cell = row.insertCell(-1);
+                cell.innerHTML = jsonString[k][col];
+            }
+        }
+
+        var header = table1.createTHead();
+        row = header.insertRow(0);    
+        for(var col in jsonString[0])
+        {
+            var cell = row.insertCell(-1);
+            cell.innerHTML = jsonString[0][col];
+        }
+
+        document.body.appendChild(table1);  
+    };
+
+    var reqSys = new XMLHttpRequest();
+    reqSys.responseType = 'json';
+    reqSys.open('GET', '/stats/sysinfo', true);
+    reqSys.onload  = function(e) {
+        var jsonResponse = reqSys.response;
+        createTable("sysinfo", jsonResponse, ["<b>Type</b>", "<b>Value</b>"]);
+    };
+    reqSys.send(null);
+
+    var reqMem = new XMLHttpRequest();
+    reqMem.responseType = 'json';
+    reqMem.open('GET', '/stats/mem', true);
+    reqMem.onload  = function(e) {
+        var jsonResponse = reqMem.response;
+        createTable("memtab", jsonResponse, ["<b>RAM</b>", "<b>Bytes</b>"]);
+    };
+    reqMem.send(null);
+
+    var reqCPU = new XMLHttpRequest();
+    reqCPU.responseType = 'json';
+    reqCPU.open('GET', '/stats/cpu', true);
+    reqCPU.onload  = function(e) {
+        var jsonResponse = reqCPU.response;
+        createTable("cpustats", jsonResponse, ["<b>Time</b>", "<b>[s]</b>"]);
+    };
+    reqCPU.send(null);
+
+    var reqThreads = new XMLHttpRequest();
+    reqThreads.responseType = 'json';
+    reqThreads.open('GET', '/stats/threads', true);
+    reqThreads.onload  = function(e) {
+        var jsonResponse = reqThreads.response;
+        create2DTable("threads", jsonResponse);
+    };
+    reqThreads.send(null);
+    </script>
+</body>
+</html>

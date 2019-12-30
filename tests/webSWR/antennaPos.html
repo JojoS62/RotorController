@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Rotor Controller</title>
+<style>
+    section {
+      text-align: center;
+    }
+    body {
+        padding: 20px;
+        margin: 0;
+        background: darkgrey
+    }
+
+</style>
+<script src="gauge_min.js"></script>    
+</head>
+<body>
+<canvas id="canvas-id"></canvas>
+<button onclick="ws_close()">Close WS</button> 
+<button onclick="ws_start()">Start WS</button> 
+<button onclick="moveToPos1()">Pos 30°</button> 
+<button onclick="moveToPos2()">Pos 110°</button> 
+<button onclick="moveToPos3()">Pos 350°</button> 
+          
+<script>
+    var ws = null;
+    var interval_SendMessage;
+
+    var ip = location.host;
+    var ws_Url = "ws://" + ip + "/ws/";
+	
+    window.onload = function(){
+      };
+
+    // Setup WebSocket connection and event handlers
+    function setup() {  
+        
+		ws = new WebSocket(ws_Url);
+		
+		interval_SendMessage = setInterval(function(){ sendMessage("{}"); }, 5000);
+
+        // Listen for the connection open event then call the sendMessage function          
+        ws.onopen = function (e) {      
+            console.log("Connected");      
+            sendMessage("{}")  
+        }
+
+        // Listen for the close connection event
+        ws.onclose = function (e) {      
+            console.log("OnClose recieved - WS disconnected");
+      			ws = null;
+        }
+
+        // Listen for connection errors
+        ws.onerror = function (e) {      
+            console.log("Error ");  // ToDo: What shall we do with a drunken error...
+        }
+
+        // Listen for new messages arriving at the client
+        ws.onmessage = function (e) {      
+	        var val = JSON.parse(e.data);
+
+            var currentValue = val[5];
+            gauge.value = currentValue;
+            //console.log("pos: " + currentValue);
+        }
+    }
+	
+	function ws_start()
+	{
+		if(ws== null)
+		{
+			console.log("Service Started");
+			setup();
+		}
+		else
+			alert("WS already running!");	
+	}
+
+	
+	function ws_close()
+	{
+		if(ws!= null)
+		{
+    		clearInterval(interval_SendMessage);
+			ws.close();
+		}
+		else
+			alert("No WS to stop!");	
+	}
+
+    // Send a message on the WebSocket.
+    function sendMessage(msg) {  
+		if(ws!= null)
+		{
+			ws.send(msg);
+			console.log("Alive msg sent");  
+		}
+    }
+
+    function moveToPos1() {
+        ws.send('30.0');
+    }
+
+    function moveToPos2() {
+        ws.send('110.0');
+    }
+
+    function moveToPos3() {
+        ws.send('350.0');
+    }
+
+var gauge = new RadialGauge({
+    renderTo: 'canvas-id',
+    width: 400,
+    height: 400,
+    minValue: 0,
+    maxValue: 360,
+    majorTicks: [
+        "N",
+        "NE",
+        "E",
+        "SE",
+        "S",
+        "SW",
+        "W",
+        "NW",
+        "N"
+    ],
+    minorTicks: 22,
+    ticksAngle: 360,
+    startAngle: 180,
+    strokeTicks: false,
+    highlights: false,
+    colorPlate: "#222",
+    colorMajorTicks: "#f5f5f5",
+    colorMinorTicks: "#ddd",
+    colorNumbers: "#ccc",
+    colorNeedle: "rgba(0, 255, 0, .7)",
+    colorNeedleEnd: "rgba(0, 255, 0, .7)",
+    valueBox: true,
+    valueDec: 1,
+    valueTextShadow: false,
+    valueBoxStroke: 2,
+    colorNeedleCircleOuter: "#ccc",
+    needleCircleSize: 15,
+    needleCircleOuter: false,
+    needleCircleInner: false,
+    animationRule: "linear",
+    needleType: "line",
+    needleStart: 75,
+    needleEnd: 99,
+    needleWidth: 3,
+    borders: true,
+    borderInnerWidth: 0,
+    borderMiddleWidth: 0,
+    borderOuterWidth: 15,
+    colorBorderOuter: "#ccc",
+    colorBorderOuterEnd: "#ccc",
+    colorNeedleShadowDown: "#222",
+    borderShadowWidth: 0,
+    animationDuration: 50,
+    useMinPath: true
+}).draw();
+
+</script>
+</body>
+</html>

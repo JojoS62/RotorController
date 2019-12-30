@@ -1,0 +1,220 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Highcharts Example</title>
+		<style type="text/css">
+	.ld-label {
+		width:200px;
+		display: inline-block;
+	}
+
+	.ld-row {
+	}
+
+	.ld-url-input {
+		width: 500px; 
+	}
+
+	.ld-time-input {
+		width: 40px;
+	}
+
+	.highcharts-figure, .highcharts-data-table table {
+	min-width: 320px; 
+	max-width: 1400px;
+	margin: 1em auto;
+	}
+
+	#container {
+	height: 500px;
+	}
+
+	.highcharts-data-table table {
+	font-family: Verdana, sans-serif;
+	border-collapse: collapse;
+	border: 1px solid #EBEBEB;
+	margin: 10px auto;
+	text-align: center;
+	width: 100%;
+	max-width: 500px;
+	}
+	.highcharts-data-table caption {
+	padding: 1em 0;
+	font-size: 1.2em;
+	color: #555;
+	}
+	.highcharts-data-table th {
+	font-weight: 600;
+	padding: 0.5em;
+	}
+	.highcharts-data-table td, .highcharts-data-table th, .highcharts-data-table caption {
+	padding: 0.5em;
+	}
+	.highcharts-data-table thead tr, .highcharts-data-table tr:nth-child(even) {
+	background: #f8f8f8;
+	}
+	.highcharts-data-table tr:hover {
+	background: #f1f7ff;
+	}
+</style>
+</head>
+<body>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+
+<figure class="highcharts-figure">
+    <div id="container"></div>
+    <p class="highcharts-description">
+        Chart showing data from ADC
+    </p>
+</figure>
+
+<div class="ld-row">
+	<label class="ld-label">
+		this checkbox has no function yet
+	</label>
+	<input type="checkbox" checked="checked" id="enable WS"/>
+</div>
+
+
+<script type="text/javascript">
+    var ip = location.host;
+  	var ws_Url = "ws://" + ip + "/ws/";
+    var intervalSendWatchdog;
+
+	
+    // Send a message on the WebSocket.
+    function sendMessage(msg) {  
+		if(ws!= null)
+		{
+			ws.send(msg);
+			console.log("Alive msg sent");  
+		}
+    }
+
+    // Setup WebSocket connection and event handlers
+    function setup() {  
+        
+		ws = new WebSocket(ws_Url);
+		
+        // Listen for the connection open event then call the sendMessage function          
+        ws.onopen = function (e) {      
+            console.log("Connected");
+			intervalSendWatchdog = setInterval(function(){ sendMessage("{}"); }, 5000);
+        }
+
+        // Listen for the close connection event
+        ws.onclose = function (e) {      
+            console.log("OnClose recieved - WS disconnected");
+			clearInterval(intervalSendWatchdog);
+  			ws = null;
+      }
+
+        // Listen for connection errors
+        ws.onerror = function (e) {      
+            console.log("Error ");  // ToDo: What shall we do with a drunken error...
+        }
+
+        // Listen for new messages arriving at the client
+        ws.onmessage = function (e) {      
+	    	//var request = (e.data).split(",");
+			//val = e.data;
+			console.log(e.data);
+			var val = JSON.parse(e.data);
+			console.log(val);
+			//chart.series[0].setData(val[0] / 1000.0, true);
+			var x = val[0];
+			var y = val[1] / 1000.0;
+			console.log(y);
+            chart.series[0].addPoint([x, y], true, true);
+        }
+    }
+
+	var chart = Highcharts.chart('container', {
+		chart: {
+			animation: false, // don't animate in old IE
+			marginRight: 10,
+			events: {
+				load: function () {
+					// set up the updating of the chart each second
+					var series = this.series[0];
+				}
+			}
+		},
+
+		time: {
+			useUTC: false
+		},
+
+		title: {
+			text: 'Live ADC data'
+		},
+
+		xAxis: {
+			type: 'datetime',
+			tickPixelInterval: 150
+		},
+
+		yAxis: {
+			title: {
+				text: 'Value'
+			},
+			min: 3.000,
+			max: 3.300,
+			plotLines: [{
+				value: 0,
+				width: 2,
+				color: '#808080'
+			}]
+		},
+
+		tooltip: {
+			headerFormat: '<b>{series.name}</b><br/>',
+			pointFormat: '{point.x:%Y-%m-%d %H:%M:%S}<br/>{point.y:.2f}'
+		},
+
+		legend: {
+			enabled: false
+		},
+
+		exporting: {
+			enabled: true
+		},
+
+		plotOptions: {
+			series: {
+				marker: {
+					enabled: false
+				}
+			}
+		},
+
+		series: [{
+			name: 'ADC channel 0',
+			data: (function () {
+				// generate an array of random data
+				var data = [],
+					time = (new Date()).getTime(),
+					i;
+
+				for (i = -399; i <= 0; i += 1) {
+					data.push({
+						x: 0,
+						y: 0
+					});
+				}
+				return data;
+			}())
+		}]
+		
+
+	});
+
+	setup();
+
+		</script>
+	</body>
+</html> 

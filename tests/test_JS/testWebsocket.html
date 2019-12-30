@@ -1,0 +1,40 @@
+var WebSocket = require('websocket').client;
+
+var urlToWebsocketServer = "ws://192.168.100.80:8081/ws/";
+var socket = new WebSocket(urlToWebsocketServer);
+
+
+// callback-Funktion wird gerufen, wenn die Verbindung erfolgreich aufgebaut werden konnte
+
+socket.onopen = function () {
+
+    console.log("Verbindung wurde erfolgreich aufgebaut");
+
+};
+
+
+// callback-Funktion wird gerufen, wenn eine neue Websocket-Nachricht eintrifft
+
+socket.onmessage = function (messageEvent) {
+
+    console.log(messageEvent.data);
+
+};
+
+
+// callback-Funktion wird gerufen, wenn ein Fehler auftritt
+
+socket.onerror = function (errorEvent) {
+
+    console.log("Error! Die Verbindung wurde unerwartet geschlossen");
+
+};
+
+
+socket.onclose = function (closeEvent) {
+
+    console.log('Die Verbindung wurde geschlossen --- Code: ' + closeEvent.code + ' --- Grund: ' + closeEvent.reason);
+
+};
+
+socket.open();

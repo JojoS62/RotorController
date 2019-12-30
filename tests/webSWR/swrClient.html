@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>WebSocket SWR Client</title>
+<link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+<link href='https://fonts.googleapis.com/css?family=Orbitron' rel='stylesheet' type='text/css'>
+<style>
+    body {
+      background-color:black;
+    }
+    section {
+      text-align: center;
+    }
+    canvas {
+      padding: 1em;
+      margin: 0em;
+    }
+
+    #lowswr, #swr, #highswr {
+     float: left;
+     width: 33%;
+     box-sizing: border-box;
+    }
+
+    #highswr {
+         margin-right: 0;
+    }
+
+    #lowswr {
+        text-align: right;
+    }
+    #swr {
+        text-align: center
+    }
+    #highswr {
+        text-align: left
+    }
+
+</style>
+</head>
+<body>
+        <div id="lowswr" style="font-family: 'Orbitron', sans-serif; font-size:100px; color: darkslategrey;">0,0</div>
+        <div id="swr" style="font-family: 'Orbitron', sans-serif; font-size:100px; color: greenyellow;">0,0</div>
+        <div id="highswr" style="font-family: 'Orbitron', sans-serif; font-size:100px; color: darkslategray;">0,0</div>
+<section class="main">
+    <canvas id="swr_device" width="100" height="400" data-val="0">No canvas</canvas>
+    <canvas id="swr_device2" width="100" height="400" data-val="0">No canvas</canvas>
+    <canvas id="swr_device3" width="100" height="400" data-val="0">No canvas</canvas>
+    <canvas id="swr_device4" width="100" height="400" data-val="0">No canvas</canvas>
+</section>
+
+<button onclick="ws_close()">Close WS</button> 
+<button onclick="ws_start()">Start WS</button> 
+<div id="msgCountTotal" style="font-family: 'Rototron', monospace; font-size:50px; color: lime;"></div>
+<div id="msgsPerSecond" style="font-family: 'Rototron', monospace; font-size:50px; color: lime;"></div>
+
+          
+<script src="/bar.js"></script>    
+<script>
+    var swr_device = document.getElementById('swr_device');
+    var swr_device2 = document.getElementById('swr_device2');
+    var swr_device3 = document.getElementById('swr_device3');
+    var swr_device4 = document.getElementById('swr_device4');
+    var swr = document.getElementById('swr');
+    var ws = null;
+    var interval_SendMessage;
+	  var interval_ClearLowHighSWR;
+	  var minMaxThresholdTime = 10000;
+	  var sendAliveMsgTime = 10000;
+	  var measureMsgsTime = 3000;
+
+    var ip = location.host;
+	  var ws_Url = "ws://" + ip + "/ws/";
+	
+    var lswr = document.getElementById('lowswr');
+    var hswr = document.getElementById('highswr');
+    
+    var lowswr = 0;
+    var highswr = 0;
+
+    var dom_msgCountTotal = document.getElementById('msgCountTotal');
+    var msgCount = 0;
+    var msgCountTotal = 0;
+    var dom_msgsPerSecond = document.getElementById('msgsPerSecond');
+    var msgsPerSecond = 0;
+
+    window.onload = function(){
+        bar(swr_device, {
+          "boxCount": 15,
+          "boxGapFraction": 0.25,
+          "max": 100,
+        });
+        bar(swr_device2, {
+          "boxCount": 15,
+          "boxGapFraction": 0.25,
+          "max": 100,
+        });
+        bar(swr_device3, {
+          "boxCount": 15,
+          "boxGapFraction": 0.25,
+          "max": 100,
+        });
+        bar(swr_device4, {
+          "boxCount": 15,
+          "boxGapFraction": 0.25,
+          "max": 100,
+        });
+      };
+
+    // Setup WebSocket connection and event handlers
+    function setup() {  
+        
+		ws = new WebSocket(ws_Url);
+		
+		interval_SendMessage = setInterval(function(){ sendMessage("{}"); }, sendAliveMsgTime);
+		interval_ClearLowHighSWR = setInterval(function(){ clearLowHighSWR(); }, minMaxThresholdTime);
+		interval_measureMsgsPerSecond = setInterval(function(){ measureMsgsPerSecond(); }, measureMsgsTime);
+
+        // Listen for the connection open event then call the sendMessage function          
+        ws.onopen = function (e) {      
+            console.log("Connected");      
+            sendMessage("{}")  
+        }
+
+        // Listen for the close connection event
+        ws.onclose = function (e) {      
+            console.log("OnClose recieved - WS disconnected");
+      			ws = null;
+			      //setTimeout(setup, 5000); // Autorestart after 5s. ToDo: Gescheite Lösung ausdenken.
+        }
+
+        // Listen for connection errors
+        ws.onerror = function (e) {      
+            console.log("Error ");  // ToDo: What shall we do with a drunken error...
+        }
+
+        // Listen for new messages arriving at the client
+        ws.onmessage = function (e) {      
+            msgCountTotal++;
+            msgCount++;
+            dom_msgCountTotal.innerHTML = 'total msgs\t: ' + msgCountTotal;
+
+			      var val = JSON.parse(e.data);
+
+            swr_device.setAttribute('data-val', val[1] / 33.0);
+            swr_device2.setAttribute('data-val', val[2] / 33.0);
+            swr_device3.setAttribute('data-val', val[3] / 33.0);
+            swr_device4.setAttribute('data-val', val[4] / 33.0);
+
+            var currentValue = (val[1] / 1000.0).toFixed(2);
+
+            if(lowswr == 0 || currentValue < lowswr)
+            {
+                lowswr = currentValue;
+                lswr.innerHTML = lowswr;
+            }
+            if(highswr == 0 || currentValue > highswr)
+            {
+                highswr = currentValue;
+                hswr.innerHTML = highswr;
+            }
+            swr.innerHTML = currentValue;
+        }
+    }
+	
+	function ws_start()
+	{
+		if(ws== null)
+		{
+			console.log("Service Started");
+			setup();
+		}
+		else
+			alert("WS already running!");	
+	}
+
+	
+	function ws_close()
+	{
+		if(ws!= null)
+		{
+			ws.close();
+			init_swr_values();
+		}
+		else
+			alert("No WS to stop!");	
+	}
+
+    function clearLowHighSWR()
+    {
+        lowswr = 0;
+        highswr = 0;
+    }
+
+  function measureMsgsPerSecond()
+  {
+      msgsPerSecond = msgCount * 1000.0 / measureMsgsTime;
+      dom_msgsPerSecond.innerHTML = 'msgs/s\t\t: ' + msgsPerSecond.toFixed(2);
+      msgCount = 0;
+  }
+
+	function init_swr_values()
+	{
+		swr.innerHTML = "0,0";
+		hswr.innerHTML = "0,0";
+		lswr.innerHTML = "0,0";
+	  
+		swr_device.setAttribute('data-val', 0);
+		swr_device2.setAttribute('data-val', 0);
+		swr_device3.setAttribute('data-val', 0);
+		swr_device4.setAttribute('data-val', 0);
+
+		clearLowHighSWR();
+		clearInterval(interval_SendMessage); // interval clear
+		clearInterval(interval_ClearLowHighSWR); // interval clear
+	}
+	
+    // Send a message on the WebSocket.
+    function sendMessage(msg) {  
+		if(ws!= null)
+		{
+			ws.send(msg);
+			console.log("Alive msg sent");  
+		}
+    }
+
+</script>
+</body>
+</html>

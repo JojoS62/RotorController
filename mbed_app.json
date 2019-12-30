@@ -1,0 +1,14 @@
+{
+    "target_overrides": {
+        "*": {
+            "platform.all-stats-enabled": true,
+            "mbed-trace.enable": 0,
+            "mbed-http.http-buffer-size": 1024,
+			"platform.stdio-baud-rate": 115200,
+            "nsapi.socket-stats-enabled": 1,
+            "nsapi.socket-stats-max-count": 30,
+            "lwip.socket-max": 10,
+            "lwip.tcp-socket-max": 10
+        }
+    }
+}
