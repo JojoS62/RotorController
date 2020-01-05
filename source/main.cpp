@@ -9,7 +9,6 @@
 #include "HTTPHandlers.h"
 
 #include "threadIO.h"
-#include "MQTTThreadedClient.h"
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
@@ -29,6 +28,7 @@ ThreadTFTPServer  threadTFTPpServer;
 ThreadIO threadIO(50);
 
 #ifdef USE_MQTT
+#include "MQTTThreadedClient.h"
 Thread msgSender(osPriorityNormal, DEFAULT_STACK_SIZE * 3);
 using namespace MQTT;
 /*  
