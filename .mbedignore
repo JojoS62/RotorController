@@ -1,3 +1,9 @@
-BUILD/*
 tests/*
-
+MQTTClient/*
+MQTTPacket/*
+WebsocketClient/*
+util/cmdb.*
+Chart/*
+lvgl/*
+Display/*
+util/*

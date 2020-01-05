@@ -1,14 +1,49 @@
-{
+{  
+    "config": {
+        "network-interface":{
+            "help": "options are ETHERNET, ETHERNET_W5500, ETHERNET_W7500x, WIFI_ESP8266, WIFI_ODIN, MESH_LOWPAN_ND, MESH_THREAD",
+            "value": "ETHERNET_W5500"
+        },
+        "Wiznet-mosi": {
+            "macro_name": "W5500_SPI_MOSI",
+            "value": "PB_15"
+        },
+        "Wiznet-miso": {
+            "macro_name": "W5500_SPI_MISO",
+            "value": "PB_14"
+        },
+        "Wiznet-clk": {
+            "macro_name": "W5500_SPI_SCLK",
+            "value": "PB_13"
+        },
+        "Wiznet-cs": {
+            "macro_name": "W5500_SPI_CS",
+            "value": "PB_12"
+        },
+        "Wiznet-rst": {
+            "macro_name": "W5500_SPI_RST",
+            "value": "PB_9"
+        }
+    },
     "target_overrides": {
         "*": {
+            "mbed-http.http-buffer-size" : 1024,
+            "platform.stdio-baud-rate": 115200,
+            "platform.stdio-convert-newlines": true,
             "platform.all-stats-enabled": true,
             "mbed-trace.enable": 0,
-            "mbed-http.http-buffer-size": 1024,
-			"platform.stdio-baud-rate": 115200,
-            "nsapi.socket-stats-enabled": 1,
-            "nsapi.socket-stats-max-count": 30,
-            "lwip.socket-max": 10,
-            "lwip.tcp-socket-max": 10
-        }
+            "lwip.socket-max": 8,
+            "lwip.tcp-socket-max": 8         
+        },
+        "NUCLEO_F411RE": {
+            "target.clock_source": "USE_PLL_HSI",
+            "target.stdio_uart_tx": "PA_9",
+            "target.stdio_uart_rx": "PA_10"
+        },
+        "BLACKPILL_F411CE": {
+        },
+        "BLUEPILL_F103RB": {
+            "target.default_lib": "small"
+        } 
     }
 }
