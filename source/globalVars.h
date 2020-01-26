@@ -14,7 +14,7 @@
 extern SPIFBlockDevice spif;
 extern LittleFileSystem lfs;
 
-void formatSPIFlash(); 
+void formatSPIFlash(FileSystem *fs); 
 void print_SPIF_info();
 #endif
 
@@ -29,6 +29,8 @@ typedef struct
 
 extern SDIOBlockDevice bd;
 extern FATFileSystem fs;
+
+extern DigitalOut led1;
 
 extern Rotor rotor1;
 

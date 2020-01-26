@@ -81,10 +81,10 @@ int main() {
     printf("\n");
 #endif
 
-    print_dir(&lfs, "/");
-    printf("\n");
+    //print_dir(&lfs, "/");
+    //printf("\n");
 
-    print_dir(&fs, "/htmlRoot");
+    print_dir(&fs, "/");
     printf("\n");
 
     // IO Thread

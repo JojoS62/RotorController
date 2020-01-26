@@ -53,7 +53,6 @@ void ThreadIO::myThreadFn()
 {
     // thread local objects
     // take care of thread stacksize !
-    DigitalOut led1(LED1);
     I2C i2c(I2C_SDA, I2C_SCL);
     Adafruit_ADS1115 ads(&i2c);
 

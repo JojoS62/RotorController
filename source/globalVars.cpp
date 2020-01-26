@@ -5,21 +5,35 @@ GlobalVars globalVars;
 SDIOBlockDevice bd;
 FATFileSystem fs("sda", &bd);
 
-SPIFBlockDevice spif(PB_5, PB_4, PB_3, PB_0);
+//SPIFBlockDevice spif(PB_5, PB_4, PB_3, PB_0);
+SPIFBlockDevice spif(PB_5, PB_4, PB_3, PA_15);
 LittleFileSystem lfs("sdb", &spif);
 
-Rotor rotor1(PC_0, PD_9, PD_10);
+DigitalOut led1(LED1);
 
+//Rotor rotor1(PC_0, PD_9, PD_10);
+Rotor rotor1(PC_0, PC_2, PC_3);
 
-void formatSPIFlash()
+void formatSPIFlash(FileSystem *fs)
 {
-    spif.init();
-    spif.erase(0, spif.get_erase_size());
-    spif.deinit();
-    
-    lfs.format(&spif);
-}
+    volatile int err;
 
+    err = spif.init();
+    debug("spif init: %d\n", err);
+    err = spif.erase(0, spif.size());
+    debug("spif erase: %d\n", err);
+//    spif.deinit();
+
+    err = fs->mount(&spif);    
+    debug("fs mount: %d\n", err);
+    if (err) {
+        err = fs->reformat(&spif);
+        debug("fs reformat: %d\n", err);
+        
+        err = fs->mount(&spif);    
+        debug("fs mount: %d\n", err);
+    }
+}
 
 void print_dir(FileSystem *fs, const char* dirname) {
     Dir dir;

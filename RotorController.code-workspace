@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "D:\\Projects\\Sn\\LocalGit\\test\\Mbed5-Projects\\libs"
+		},
+		{
+			"path": "D:\\Projects\\Sn\\LocalGit\\test\\Mbed5-Projects\\custom_targets"
 		}
 	],
 	"settings": {

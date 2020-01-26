@@ -1,1 +1,1 @@
-tftp -i 192.168.100.80 PUT %1 /sda/htmlRoot/%1
+tftp -i 192.168.100.36 PUT %1 /sda/%1
