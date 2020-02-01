@@ -6,10 +6,8 @@ SDIOBlockDevice bd;
 FATFileSystem fs("sda", &bd);
 
 //SPIFBlockDevice spif(PB_5, PB_4, PB_3, PB_0);
-SPIFBlockDevice spif(PB_5, PB_4, PB_3, PA_15);
+SPIFBlockDevice spif(SPI3_MOSI, SPI3_MISO, SPI3_SCK, SPI3_CS);
 LittleFileSystem lfs("sdb", &spif);
-
-DigitalOut led1(LED1);
 
 //Rotor rotor1(PC_0, PD_9, PD_10);
 Rotor rotor1(PC_0, PC_2, PC_3);
