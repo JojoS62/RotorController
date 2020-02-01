@@ -81,9 +81,13 @@ int main() {
     printf("\n");
 #endif
 
-    //print_dir(&lfs, "/");
-    //printf("\n");
+#if 0
+    printf("dir lfs:\n");
+    print_dir(&lfs, "/");
+    printf("\n");
+#endif 
 
+    printf("dir fs:\n");
     print_dir(&fs, "/");
     printf("\n");
 
@@ -106,6 +110,10 @@ int main() {
 
 #ifdef USE_HTTPSERVER	
     HttpServer server(network, 5, 4);               // max 5 threads, 4 websockets
+
+    server.addStandardHeader("Server", "JojoS_Mbed_Server");
+    server.addStandardHeader("DNT", "1");
+
     server.setHTTPHandler("/", &request_handler);
     server.setHTTPHandler("/stats/", &request_handler_getStatus);
     
