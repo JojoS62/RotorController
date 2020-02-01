@@ -30,8 +30,6 @@ typedef struct
 extern SDIOBlockDevice bd;
 extern FATFileSystem fs;
 
-extern DigitalOut led1;
-
 extern Rotor rotor1;
 
 extern GlobalVars globalVars;

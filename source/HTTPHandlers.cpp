@@ -73,7 +73,7 @@ void request_handler(HttpParsedRequest* request, ClientConnection* clientConnect
     } else 
     if ((method == HTTP_POST) && (url == "/toggle")) {
         debug("%s toggle LED called\n\n", clientConnection->getThreadname());
-        led1 = !led1;
+        //led1 = !led1;
         print_dir(&fs, "/"); 
         builder.sendHeader(200);
     } else 
