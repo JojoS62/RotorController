@@ -79,7 +79,7 @@ void request_handler(HttpParsedRequest* request, ClientConnection* clientConnect
     } else 
     if ((method == HTTP_POST) && (url == "/formatFlash")) {
         debug("%s toggle LED called\n\n", clientConnection->getThreadname());
-        formatSPIFlash(&fs); 
+        formatSPIFlash(&lfs); 
         print_SPIF_info();
         builder.sendHeader(200);
     } else 
