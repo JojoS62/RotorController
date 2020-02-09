@@ -2,6 +2,8 @@
 
 #include "globalVars.h"
 
+#include "NTPClient.h"
+
 //#include "network-helper.h"
 #include "HttpServer.h"
 #include "HttpResponseBuilder.h"
@@ -13,6 +15,8 @@
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 
+// enable app features
+#define USE_NTPCLIENT
 #define USE_HTTPSERVER
 #define USE_TFTPSERVER
 //#define USE_MQTT
@@ -107,6 +111,17 @@ int main() {
         printf("Failed to connect to network (%d)\n", connect_status);
         return 2;
     } 	
+
+#ifdef USE_NTPCLIENT
+    NTPClient ntp(network);
+    time_t timestamp = ntp.get_timestamp();
+    
+    if (timestamp < 0) {
+        printf("An error occurred when getting the time. Code: %lld\r\n", timestamp);
+    } else {
+        printf("Current time is %s\r\n", ctime(&timestamp));
+    }
+#endif
 
 #ifdef USE_HTTPSERVER	
     HttpServer server(network, 5, 4);               // max 5 threads, 4 websockets
