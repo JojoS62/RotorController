@@ -115,6 +115,7 @@ int main() {
 #ifdef USE_NTPCLIENT
     NTPClient ntp(network);
     time_t timestamp = ntp.get_timestamp();
+    set_time(timestamp);
     
     if (timestamp < 0) {
         printf("An error occurred when getting the time. Code: %lld\r\n", timestamp);
