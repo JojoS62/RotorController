@@ -44,6 +44,10 @@
         },
         "BLUEPILL_F103RB": {
             "target.default_lib": "small"
-        } 
+        },
+        "DEVEBOX_F407VG": {
+            "mbed-trace.enable": "1",
+            "stm32-emac.eth-phy-address" : 1
+        }
     }
 }
