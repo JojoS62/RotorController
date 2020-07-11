@@ -26,9 +26,11 @@
 #include "TextLCD.h"
 #include "globalVars.h"
 #include "Rotor.h"
+#include "Adafruit_ST7735.h"
 
-#define STACKSIZE   (2 * 1024)
+#define STACKSIZE   (4 * 1024)
 #define THREADNAME  "ThreadIO"
+
 
 ThreadIO::ThreadIO(uint32_t cycleTime_ms) :
     _thread(osPriorityNormal, STACKSIZE, nullptr, THREADNAME)
@@ -53,14 +55,26 @@ void ThreadIO::myThreadFn()
 {
     // thread local objects
     // take care of thread stacksize !
-    I2C i2c(I2C_SDA, I2C_SCL);
+    I2C i2c(PB_7, PB_8);
     Adafruit_ADS1115 ads(&i2c);
+    Adafruit_ST7735 display(PB_15, PB_14, PB_10, PB_9, PE_4, PE_5);
+
+    display.initS();
+    display.fillScreen(ST7735_BLACK);
+    display.setCursor(10, 10);
+    display.drawRect(0, 0, 80, 160, ST7735_BLUE);
+    
+    display.setTextColor(ST7735_RED);
+    display.printf("Hello");
+
+//    display.invertDisplay(true);
+//    display.invertDisplay(false);
+
 
     while(_running) {
         uint64_t nextTime = get_ms_count() + _cycleTime;
 
         rotor1.process();
-
         for (uint i = 0; i < sizeof(globalVars.adcValues)/sizeof(globalVars.adcValues[0]); i++) {
             globalVars.adcValues[i] = ads.readADC_SingleEnded_V(i) * 1000.0f; // read channel 0 [mV]
         }
