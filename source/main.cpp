@@ -12,9 +12,6 @@
 
 #include "threadIO.h"
 
-#define STRINGIFY(x) #x
-#define TOSTRING(x) STRINGIFY(x)
-
 // enable app features
 #define USE_NTPCLIENT
 #define USE_HTTPSERVER
@@ -77,7 +74,7 @@ class CallbackTest
 #endif
 
 int main() {
-    printf("Hello from "  TOSTRING(TARGET_NAME) "\n");
+    printf("Hello from "  MBED_STRINGIFY(TARGET_NAME) "\n");
     printf("Mbed OS version: %d.%d.%d\n\n", MBED_MAJOR_VERSION, MBED_MINOR_VERSION, MBED_PATCH_VERSION);
 
 #ifdef COMPONENT_SPIF
