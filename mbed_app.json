@@ -27,6 +27,7 @@
     },
     "target_overrides": {
         "*": {
+            "target.printf_lib": "std",
             "mbed-http.http-buffer-size" : 1024,
             "platform.stdio-baud-rate": 115200,
             "platform.stdio-convert-newlines": true,

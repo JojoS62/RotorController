@@ -28,7 +28,7 @@
 class ThreadIO
 {
     public:
-    ThreadIO(uint32_t cycleTime_ms);
+    ThreadIO(chrono::milliseconds cycleTime);
 
     /*
         start() : starts the thread
@@ -37,7 +37,7 @@ class ThreadIO
 
     private:
     void myThreadFn();
-    uint32_t _cycleTime;
+    chrono::milliseconds _cycleTime;
     Thread  _thread;
     bool _running;
 };

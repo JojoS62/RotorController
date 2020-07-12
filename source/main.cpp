@@ -26,7 +26,7 @@
 ThreadTFTPServer  threadTFTPpServer;
 #endif
 
-ThreadIO threadIO(50);
+ThreadIO threadIO(50ms);
 
 #ifdef USE_MQTT
 #include "MQTTThreadedClient.h"
@@ -192,6 +192,6 @@ int main() {
 #endif
 
     while(true) {
-        ThisThread::sleep_for(10000);
+        ThisThread::sleep_for(10s);
     }
 }

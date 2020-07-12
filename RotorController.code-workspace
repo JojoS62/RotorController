@@ -31,7 +31,8 @@
 			"mstd_iterator": "cpp",
 			"*.tcc": "cpp",
 			"fstream": "cpp",
-			"xstring": "cpp"
+			"xstring": "cpp",
+			"chrono": "cpp"
 		}
 	}
 }

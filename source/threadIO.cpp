@@ -32,10 +32,10 @@
 #define THREADNAME  "ThreadIO"
 
 
-ThreadIO::ThreadIO(uint32_t cycleTime_ms) :
+ThreadIO::ThreadIO(chrono::milliseconds cycleTime) :
     _thread(osPriorityNormal, STACKSIZE, nullptr, THREADNAME)
 {
-    _cycleTime = cycleTime_ms;
+    _cycleTime = cycleTime;
 }
 
 /*
@@ -72,12 +72,12 @@ void ThreadIO::myThreadFn()
 
 
     while(_running) {
-        uint64_t nextTime = get_ms_count() + _cycleTime;
+        auto nextTime = Kernel::Clock::now() + 50ms;   //_cycleTime;
 
         rotor1.process();
-        for (uint i = 0; i < sizeof(globalVars.adcValues)/sizeof(globalVars.adcValues[0]); i++) {
-            globalVars.adcValues[i] = ads.readADC_SingleEnded_V(i) * 1000.0f; // read channel 0 [mV]
-        }
+        // for (uint i = 0; i < sizeof(globalVars.adcValues)/sizeof(globalVars.adcValues[0]); i++) {
+        //     globalVars.adcValues[i] = ads.readADC_SingleEnded_V(i) * 1000.0f; // read channel 0 [mV]
+        // }
 
         globalVars.rotorPosActual += 0.3f;
         if (globalVars.rotorPosActual >= 360.0f)
