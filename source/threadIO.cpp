@@ -72,7 +72,7 @@ void ThreadIO::myThreadFn()
 
 
     while(_running) {
-        auto nextTime = Kernel::Clock::now() + 50ms;   //_cycleTime;
+        auto nextTime = Kernel::Clock::now() + _cycleTime;
 
         rotor1.process();
         // for (uint i = 0; i < sizeof(globalVars.adcValues)/sizeof(globalVars.adcValues[0]); i++) {
